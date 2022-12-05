@@ -2,6 +2,7 @@
 
 package com.bignerdranch.android.criminalintent2
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -13,11 +14,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.text.SimpleDateFormat
 import java.util.*
 
 private const val TAG = "CrimeListFragment"
 
-class CrimeListFragment : Fragment()
+class CrimeListFragment : Fragment ()
 {
     interface Callbacks
     {
@@ -26,27 +28,14 @@ class CrimeListFragment : Fragment()
 
     private var callbacks: Callbacks? = null
     private lateinit var crimeRecyclerView: RecyclerView
-    private var adapter: CrimeAdapter? = CrimeAdapter(emptyList())
-    private val crimeListViewModel: CrimeListViewModel by lazy{
+    private val crimeListViewModel: CrimeListViewModel by lazy {
         ViewModelProviders.of(this).get(CrimeListViewModel::class.java)
-    }
-
-    private fun updateUI(crimes: List<Crime>)
-    {
-        adapter = CrimeAdapter(crimes)
-        crimeRecyclerView.adapter = adapter
     }
 
     override fun onAttach(context: Context)
     {
         super.onAttach(context)
         callbacks = context as Callbacks?
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
     }
 
     override fun onDetach()
@@ -76,6 +65,15 @@ class CrimeListFragment : Fragment()
         }
     }
 
+    private var adapter: CrimeAdapter? = CrimeAdapter(emptyList())
+
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -94,38 +92,36 @@ class CrimeListFragment : Fragment()
         super.onViewCreated(view, savedInstanceState)
         crimeListViewModel.crimeListLiveData.observe(
             viewLifecycleOwner,
-            Observer { crimes -> crimes?.let {
+            Observer { crimes ->
+                crimes?.let {
                     Log.i(TAG, "Got crimes${crimes.size}")
                     updateUI(crimes)
                 }
             })
     }
 
-    companion object
+    private fun updateUI(crimes: List<Crime>)
     {
-        fun newInstance(): CrimeListFragment
-        {
-            return CrimeListFragment()
-        }
+        adapter = CrimeAdapter(crimes)
+        crimeRecyclerView.adapter = adapter
     }
 
-    private inner class CrimeHolder(view: View)  : RecyclerView.ViewHolder(view), View.OnClickListener
+    private inner class CrimeHolder(view: View) : RecyclerView.ViewHolder(view),View.OnClickListener
     {
         private lateinit var crime: Crime
-        val titleTextView: TextView = itemView.findViewById(R.id.crime_title)
-        val dateTextView: TextView = itemView.findViewById(R.id.crime_date)
         private val solvedImageView: ImageView = itemView.findViewById(R.id.crime_solved)
-
+        private val titleTextView: TextView = itemView.findViewById(R.id.crime_title)
+        private val dateTextView: TextView = itemView.findViewById(R.id.crime_date)
         init
         {
             itemView.setOnClickListener(this)
         }
-
+        @SuppressLint("SimpleDateFormat")
         fun bind(crime: Crime)
         {
             this.crime = crime
             titleTextView.text = this.crime.title
-            dateTextView.text = this.crime.date.toString()
+            dateTextView.text = SimpleDateFormat("EEEE, MMM d, k:m , yyyy").format(crime.date)
             solvedImageView.visibility = if (crime.isSolved)
             {
                 View.VISIBLE
@@ -134,7 +130,6 @@ class CrimeListFragment : Fragment()
             {
                 View.GONE
             }
-
         }
 
         override fun onClick(v: View)
@@ -143,7 +138,8 @@ class CrimeListFragment : Fragment()
         }
     }
 
-    private inner class CrimeAdapter(var crimes: List<Crime>) : RecyclerView.Adapter<CrimeHolder>()
+    private inner class CrimeAdapter(var crimes: List<Crime>) :
+        RecyclerView.Adapter<CrimeHolder>()
     {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CrimeHolder
         {
@@ -151,12 +147,20 @@ class CrimeListFragment : Fragment()
             return CrimeHolder(view)
         }
 
+        override fun getItemCount() = crimes.size
+
         override fun onBindViewHolder(holder: CrimeHolder, position: Int)
         {
             val crime = crimes[position]
             holder.bind(crime)
         }
+    }
 
-        override fun getItemCount() = crimes.size
+    companion object
+    {
+        fun newInstance(): CrimeListFragment
+        {
+            return CrimeListFragment()
+        }
     }
 }

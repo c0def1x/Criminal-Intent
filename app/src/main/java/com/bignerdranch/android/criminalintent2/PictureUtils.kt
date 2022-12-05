@@ -32,6 +32,7 @@ fun getScaledBitmap(path: String, destWidth: Int, destHeight: Int): Bitmap
         {
             widthScale
         }
+
         inSampleSize = Math.round(sampleScale)
     }
     options = BitmapFactory.Options()

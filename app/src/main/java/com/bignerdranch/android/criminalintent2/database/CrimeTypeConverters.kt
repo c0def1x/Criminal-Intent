@@ -6,9 +6,9 @@ import java.util.*
 class CrimeTypeConverters
 {
     @TypeConverter
-    fun fromDate(date: Date): Long
+    fun fromDate(date: Date?): Long?
     {
-        return date.time
+        return date?.time
     }
 
     @TypeConverter

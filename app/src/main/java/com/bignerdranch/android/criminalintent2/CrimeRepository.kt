@@ -14,21 +14,21 @@ private const val DATABASE_NAME = "crime-database"
 class CrimeRepository private constructor(context: Context)
 {
     private val database : CrimeDatabase = Room.databaseBuilder(
-        context.applicationContext,
-        CrimeDatabase::class.java,
-        DATABASE_NAME).addMigrations(migration_1_2).build()
+            context.applicationContext,
+            CrimeDatabase::class.java,
+            DATABASE_NAME
+        ).addMigrations(migration_1_2).build()
 
     private val crimeDao = database.crimeDao()
     private val executor = Executors.newSingleThreadExecutor()
     private val filesDir = context.applicationContext.filesDir
-
     fun getCrimes(): LiveData<List<Crime>> = crimeDao.getCrimes()
 
     fun getCrime(id: UUID): LiveData<Crime?> = crimeDao.getCrime(id)
 
     fun updateCrime(crime: Crime)
     {
-        executor.execute{
+        executor.execute {
             crimeDao.updateCrime(crime)
         }
     }

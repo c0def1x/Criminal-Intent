@@ -1,7 +1,10 @@
 package com.bignerdranch.android.criminalintent2.database
 
 import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
 import com.bignerdranch.android.criminalintent2.Crime
 import java.util.*
 

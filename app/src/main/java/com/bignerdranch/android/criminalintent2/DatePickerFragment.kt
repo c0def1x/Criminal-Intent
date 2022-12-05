@@ -1,15 +1,11 @@
 package com.bignerdranch.android.criminalintent2
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.Dialog
-import android.icu.util.Calendar
-import android.icu.util.GregorianCalendar
-import android.os.Build
 import android.os.Bundle
 import android.widget.DatePicker
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.DialogFragment
-import java.sql.Date
 
 private const val ARG_DATE = "date"
 
@@ -17,29 +13,30 @@ class DatePickerFragment : DialogFragment()
 {
     interface Callbacks
     {
-        fun onDateSelected(date: Date)
+        fun onDateSelected(date: java.util.Date)
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
+    @SuppressLint("SuspiciousIndentation")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
     {
+        val calendar = java.util.Calendar.getInstance()
+        val hour = calendar.get(java.util.Calendar.HOUR_OF_DAY)
+        val min = calendar.get(java.util.Calendar.MINUTE)
         val dateListener = DatePickerDialog.OnDateSetListener {
                     _: DatePicker, year: Int,
                     month: Int, day: Int ->
-                val resultDate : Date =
-                    GregorianCalendar(year, month, day).time as Date
+                val resultDate : java.util.Date =
+                    java.util.GregorianCalendar(year, month, day, hour, min).time
                 targetFragment?.let { fragment ->
-                    (fragment as
-                            Callbacks).onDateSelected(resultDate)
+                    (fragment as Callbacks).onDateSelected(resultDate)
                 }
             }
 
-        val date = arguments?.getSerializable(ARG_DATE) as Date
-        val calendar = Calendar.getInstance()
+        val date = arguments?.getSerializable(ARG_DATE) as java.util.Date
         calendar.time = date
-        val initialYear = calendar.get(Calendar.YEAR)
-        val initialMonth = calendar.get(Calendar.MONTH)
-        val initialDay = calendar.get(Calendar.DAY_OF_MONTH)
+        val initialYear = calendar.get(java.util.Calendar.YEAR)
+        val initialMonth = calendar.get(java.util.Calendar.MONTH)
+        val initialDay = calendar.get(java.util.Calendar.DAY_OF_MONTH)
         return DatePickerDialog(
             requireContext(),
             dateListener,
@@ -51,9 +48,9 @@ class DatePickerFragment : DialogFragment()
 
     companion object
     {
-        fun newInstance(date: Date): DatePickerFragment
+        fun newInstance(date: java.util.Date): DatePickerFragment
         {
-            val args = Bundle().apply{
+            val args = Bundle().apply {
                 putSerializable(ARG_DATE, date)
             }
             return DatePickerFragment().apply {
